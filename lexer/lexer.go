@@ -2,7 +2,7 @@ package lexer
 
 import (
 	"go/token"
-	"monkey-interpreter/token"
+	"../token"
 )
 
 type Lexer struct {
@@ -31,6 +31,8 @@ func (l *Lexer) readChar() {
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
+        l.skipWhitespace()
+
 	switch l.ch {
 	case '=':
 		tok = newToken(token.ASSIGN, l.ch)
@@ -55,13 +57,23 @@ func (l *Lexer) NextToken() token.Token {
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
 			return tok
-		} else {
+		} else if isDigit(l.ch) {
+                        tok.Type = toke.INT
+                        tok.Literal = l.readNumber()
+                        return tok
+                } else {
 			tok = newToken(token.ILLEGAL, l.ch)
 		}
 	}
 
 	l.readChar()
 	return tok
+}
+
+func (l *Lexer) skipWhitespace() {
+        for l.ch == ' ' || l.ch == '\t' || l.ch =='\n' || l.ch == '\r' {
+                l.readChar()
+        }
 }
 
 func newToken(tokenType token.TokenType, ch byte) token.Token {
@@ -74,6 +86,18 @@ func (l *Lexer) readIdentifier() string {
 		l.readChar()
 	}
 	return l.input[position:l.position]
+}
+
+func (l *Lexer) readNumber() string {
+        position := l.position
+        for is Digit(l.ch) {
+                l.readChar()
+        }
+        return l.input[position:l.position]
+}
+
+func isDigit(ch byte) bool {
+        return '0' <= ch && ch <= '9'
 }
 
 func isLetter(ch byte) bool {

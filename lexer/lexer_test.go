@@ -1,8 +1,8 @@
-pacakge lexer
+package lexer
 
 import (
 	"testing"
-	"monkey/token"
+	"../token"
 )
 
 func TextNextToken(t +testing.T) {
